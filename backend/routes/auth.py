@@ -71,13 +71,16 @@ async def callback(code: str, state: str = None, response: Response = None):
         
         # Set session cookie and redirect to frontend
         redirect_response = RedirectResponse(url=frontend_url)
+        
+        is_production = "https" in frontend_url
+        
         redirect_response.set_cookie(
             key="session_id",
             value=session_id,
             httponly=True,
             max_age=86400,  # 24 hours
-            samesite="lax",
-            secure=True if "https" in frontend_url else False
+            samesite="none" if is_production else "lax",
+            secure=True if is_production else False
         )
         
         return redirect_response
