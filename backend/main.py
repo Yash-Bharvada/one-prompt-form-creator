@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from routes import auth, generate, history, settings
 from database import verify_connection
 import uvicorn
+import os
 
 app = FastAPI(
     title="One-Prompt Google Form Creator API",
@@ -11,9 +12,14 @@ app = FastAPI(
 )
 
 # CORS middleware
+origins = [
+    "http://localhost:3000",
+    os.getenv("FRONTEND_URL", "http://localhost:3000")
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Frontend URL
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
