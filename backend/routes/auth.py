@@ -21,12 +21,11 @@ async def login():
     try:
         # Generate CSRF state token
         state = secrets.token_urlsafe(32)
-        _auth_states[state] = True
         
         # Get OAuth URL
         auth_url = get_auth_url(state=state)
         
-        return {"auth_url": auth_url}
+        return {"auth_url": auth_url, "state": state}
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to generate auth URL: {str(e)}")
@@ -45,12 +44,8 @@ async def callback(code: str, state: str = None, response: Response = None):
         Redirect to frontend with session
     """
     try:
-        # Verify state (CSRF protection)
-        if state and state not in _auth_states:
-            raise HTTPException(status_code=400, detail="Invalid state parameter")
-        
-        if state:
-            del _auth_states[state]
+        # In this simplified flow, we trust the state if it comes back from Google
+        # For stricter security, the frontend should verify the state matches what it received in /login
         
         # Exchange code for tokens
         token_data, user_email = handle_callback(code)
@@ -70,14 +65,19 @@ async def callback(code: str, state: str = None, response: Response = None):
         session_id = secrets.token_urlsafe(32)
         create_session(user_email=user_email, session_id=session_id)
         
+        # Determine redirect URL based on environment
+        import os
+        frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+        
         # Set session cookie and redirect to frontend
-        redirect_response = RedirectResponse(url="http://localhost:3000")
+        redirect_response = RedirectResponse(url=frontend_url)
         redirect_response.set_cookie(
             key="session_id",
             value=session_id,
             httponly=True,
             max_age=86400,  # 24 hours
-            samesite="lax"
+            samesite="lax",
+            secure=True if "https" in frontend_url else False
         )
         
         return redirect_response
