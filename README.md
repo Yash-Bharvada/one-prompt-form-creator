@@ -117,13 +117,14 @@ Open `http://localhost:3000` in your browser
 
 ## 📖 How to Use
 
-1. **Sign In**: Click "Sign in with Google" and authorize the app
-2. **Describe Your Form**: Enter a natural language prompt, e.g.:
+1. **Sign In**: Click "Sign in with Google" and authorize the app.
+2. **Configure AI** (Required): Go to **Settings** → **AI Configuration** to enter your Google Gemini API Key. You **must** provide your own API key to generate forms.
+3. **Describe Your Form**: Enter a natural language prompt, e.g.:
    - "Create a customer feedback form with name, email, rating (1-5), and comments"
    - "Event registration with name, email, t-shirt size (S/M/L/XL), dietary restrictions (checkbox)"
-3. **Generate**: Click "Magic Generate" and wait for AI to create your form
-4. **Access Form**: Click the link to open your form in Google Forms
-5. **View History**: See all your previously generated forms
+4. **Generate**: Click "Magic Generate" and wait for AI to create your form.
+5. **Access Form**: Click the link to open your form in Google Forms.
+6. **View History**: See all your previously generated forms.
 
 ## 🔧 API Endpoints
 
@@ -141,8 +142,13 @@ Open `http://localhost:3000` in your browser
   }
   ```
 
-### History
+### History & Stats
 - `GET /api/history?skip=0&limit=20` - Get form history
+- `GET /api/stats` - Get user statistics (total forms, tokens used)
+
+### Settings
+- `POST /api/settings/gemini-key` - Save custom Gemini API key (encrypted)
+- `GET /api/settings/gemini-key` - Check custom key status
 
 ## 🧪 Testing
 
@@ -179,7 +185,8 @@ npm run build
 - MongoDB (Local)
 
 **AI:**
-- Google Gemini 3 Pro (gemini-2.0-flash-exp)
+- Google Gemini 1.5 Flash (via Generative AI SDK)
+- Custom User API Key Support
 
 ## 🔒 Security
 
